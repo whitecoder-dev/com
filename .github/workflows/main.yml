@@ -1,0 +1,29 @@
+name: Auto Commit
+
+on:
+  schedule:
+    # මේකෙන් කියන්නේ හැමදාම UTC වෙලාවෙන් පාන්දර 12:00 ට run වෙන්න කියලා.
+    - cron: '0 0 * * *' 
+  workflow_dispatch: # ඔයාට ඕන වෙලාවක manual run කරන්නත් මේකෙන් පුළුවන්
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update file
+        run: |
+          # update.txt කියන file එකට දැනට තියෙන දිනය සහ වෙලාව ලියනවා
+          echo "Last Auto Commit on $(date)" > update.txt
+          
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Auto Bot"
+          git add update.txt
+          git commit -m "Automated commit: $(date)" || echo "No changes to commit"
+          git push
